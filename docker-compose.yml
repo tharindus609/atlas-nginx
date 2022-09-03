@@ -9,6 +9,7 @@ services:
     volumes:
       - ./conf/nginx/nginx.conf:/etc/nginx/nginx.conf
       - ./conf/nginx/conf.d:/etc/nginx/conf.d
+      - ./site-data:/home/site-data
       - certbot_data:/var/www/certbot
       - certbot_config:/etc/letsencrypt
   
