@@ -1,55 +1,29 @@
-# nginx
-
-
+# nginx server with certbot client for ssl key management
 
 ## Getting started
+At first startup nginx will need default ssl keys in order to complete startup to server the acme challenges. For this follow bellow steps
 
-To make it easy for you to get started with GitLab, here's a list of recommended next steps.
+[Reference Article](https://pentacent.medium.com/nginx-and-lets-encrypt-with-docker-in-less-than-5-minutes-b4b8a60d3a71)
 
-Already a pro? Just edit this README.md and make it your own. Want to make it easy? [Use the template at the bottom](#editing-this-readme)!
-
-## Add your files
-
-- [ ] [Create](https://docs.gitlab.com/ee/user/project/repository/web_editor.html#create-a-file) or [upload](https://docs.gitlab.com/ee/user/project/repository/web_editor.html#upload-a-file) files
-- [ ] [Add files using the command line](https://docs.gitlab.com/ee/gitlab-basics/add-file.html#add-a-file-using-the-command-line) or push an existing Git repository with the following command:
-
+1. Create temporary directories to store the keys
 ```
-cd existing_repo
-git remote add origin https://gitlab.com/atlas-container-stacks/nginx.git
-git branch -M main
-git push -uf origin main
+docker compose run --rm --entrypoint "mkdir -p /etc/letsencrypt/live/bi-frost.xyz/" certbot
 ```
+2. Generate temporary keys
+```
+docker compose run --rm --entrypoint "openssl req -x509 -nodes -newkey rsa:4096 -days 1 -keyout '/etc/letsencrypt/live/bi-frost.xyz/privkey.pem' -out '/etc/letsencrypt/live/bi-frost.xyz/fullchain.pem' -subj '/CN=localhost'" certbot
 
-## Integrate with your tools
-
-- [ ] [Set up project integrations](https://gitlab.com/atlas-container-stacks/nginx/-/settings/integrations)
-
-## Collaborate with your team
-
-- [ ] [Invite team members and collaborators](https://docs.gitlab.com/ee/user/project/members/)
-- [ ] [Create a new merge request](https://docs.gitlab.com/ee/user/project/merge_requests/creating_merge_requests.html)
-- [ ] [Automatically close issues from merge requests](https://docs.gitlab.com/ee/user/project/issues/managing_issues.html#closing-issues-automatically)
-- [ ] [Enable merge request approvals](https://docs.gitlab.com/ee/user/project/merge_requests/approvals/)
-- [ ] [Automatically merge when pipeline succeeds](https://docs.gitlab.com/ee/user/project/merge_requests/merge_when_pipeline_succeeds.html)
-
-## Test and Deploy
-
-Use the built-in continuous integration in GitLab.
-
-- [ ] [Get started with GitLab CI/CD](https://docs.gitlab.com/ee/ci/quick_start/index.html)
-- [ ] [Analyze your code for known vulnerabilities with Static Application Security Testing(SAST)](https://docs.gitlab.com/ee/user/application_security/sast/)
-- [ ] [Deploy to Kubernetes, Amazon EC2, or Amazon ECS using Auto Deploy](https://docs.gitlab.com/ee/topics/autodevops/requirements.html)
-- [ ] [Use pull-based deployments for improved Kubernetes management](https://docs.gitlab.com/ee/user/clusters/agent/)
-- [ ] [Set up protected environments](https://docs.gitlab.com/ee/ci/environments/protected_environments.html)
-
-***
-
-# Editing this README
-
-When you're ready to make this README your own, just edit this file and use the handy template below (or feel free to structure it however you want - this is just a starting point!). Thank you to [makeareadme.com](https://www.makeareadme.com/) for this template.
-
-## Suggestions for a good README
-Every project is different, so consider which of these sections apply to yours. The sections used in the template are suggestions for most open source projects. Also keep in mind that while a README can be too long and detailed, too long is better than too short. If you think your README is too long, consider utilizing another form of documentation rather than cutting out information.
+docker compose run --rm --entrypoint "cp /etc/letsencrypt/live/bi-frost.xyz/fullchain.pem /etc/letsencrypt/live/bi-frost.xyz/chain.pem" certbot
+```
+3. Restart Nging service/container
+4. Remove temp keys to generate the actual keys
+```
+docker compose run --rm --entrypoint "rm -rf /etc/letsencrypt/live/bi-frost.xyz" certbot
+```
+5. Request keys for required domains
+```
+docker compose run --rm --entrypoint "certbot certonly --webroot -w /var/www/certbot --email admin@bi-frost.xyz -d bi-frost.xyz,www.bi-frost.xyz,portainer.bi-frost.xyz,luthor.bi-frost.xyz,stats.luthor.bi-frost.xyz,pihole.bi-frost.xyz --agree-tos --force-renewal" certbot
+```
 
 ## Name
 Choose a self-explaining name for your project.
