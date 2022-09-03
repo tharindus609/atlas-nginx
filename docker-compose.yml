@@ -7,5 +7,20 @@ services:
       - 80:80
       - 443:443
     volumes:
-      - ./conf/nginx.conf:/etc/nginx/nginx.conf
-      - ./conf/conf.d:/etc/nginx/conf.d
+      - ./conf/nginx/nginx.conf:/etc/nginx/nginx.conf
+      - ./conf/nginx/conf.d:/etc/nginx/conf.d
+      - certbot_data:/var/www/certbot
+      - certbot_config:/etc/letsencrypt
+  
+  certbot:
+    container_name: certbot
+    image: certbot/certbot:arm32v6-latest
+    volumes:
+      - certbot_data:/var/www/certbot
+      - certbot_config:/etc/letsencrypt
+      - certbot_libs:/var/lib/letsencrypt
+
+volumes:
+  certbot_data:
+  certbot_config:
+  certbot_libs:
