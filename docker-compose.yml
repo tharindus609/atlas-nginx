@@ -15,7 +15,7 @@ services:
   
   certbot:
     container_name: certbot
-    image: certbot/certbot:arm32v6-latest
+    image: certbot/certbot:arm64v8-latest
     volumes:
       - certbot_data:/var/www/certbot
       - certbot_config:/etc/letsencrypt
