@@ -1,3 +1,4 @@
+version: '3'
 services:
   nginx:
     container_name: nginx
@@ -12,6 +13,8 @@ services:
       - ./site-data:/home/site-data
       - certbot_data:/var/www/certbot
       - certbot_config:/etc/letsencrypt
+    networks:
+      - nginx_net
   
   certbot:
     container_name: certbot
@@ -20,8 +23,24 @@ services:
       - certbot_data:/var/www/certbot
       - certbot_config:/etc/letsencrypt
       - certbot_libs:/var/lib/letsencrypt
+    networks:
+      - nginx_net
+  
+  nginx-exporter:
+    container_name: nginx-exporter
+    image: nginx/nginx-prometheus-exporter:latest
+    ports:
+      - 9100:9113
+    command:
+      - -nginx.scrape-uri
+      - http://nginx/status
+    networks:
+      - nginx_net
 
 volumes:
   certbot_data:
   certbot_config:
   certbot_libs:
+
+networks:
+  nginx_net:
