@@ -5,4 +5,6 @@ venv.bak/
 
 # VisualStudioCode
 .vscode/*
+
+# Custom
 site-data/**/
